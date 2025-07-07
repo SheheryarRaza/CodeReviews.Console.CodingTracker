@@ -70,7 +70,7 @@ namespace CodingTracker.SheheryarRaza
             AnsiConsole.Clear();
             AnsiConsole.Write(new Rule($"[bold blue]{title}[/]"));
 
-            sessions ??= _repository.GetAllSessions(); // If sessions is null, get all from repo
+            sessions ??= _repository.GetAllSessions();
 
             if (sessions == null || !sessions.Any())
             {
@@ -91,7 +91,7 @@ namespace CodingTracker.SheheryarRaza
                     session.Id.ToString(),
                     session.StartTime.ToString(Validation.DateTimeFormat),
                     session.EndTime.ToString(Validation.DateTimeFormat),
-                    session.Duration.ToString(@"hh\:mm\:ss") // Format TimeSpan for display
+                    session.Duration.ToString(@"hh\:mm\:ss")
                 );
             }
 
@@ -109,14 +109,13 @@ namespace CodingTracker.SheheryarRaza
             newSession.StartTime = UserInput.GetDateTimeInput("Enter Start Time");
             newSession.EndTime = UserInput.GetDateTimeInput("Enter End Time");
 
-            // Validate that EndTime is not before StartTime
             if (newSession.EndTime < newSession.StartTime)
             {
                 AnsiConsole.MarkupLine("[red]Error: End Time cannot be before Start Time. Session not added.[/]");
                 return;
             }
 
-            newSession.CalculateDuration(); // Calculate duration automatically
+            newSession.CalculateDuration();
 
             try
             {
@@ -140,7 +139,7 @@ namespace CodingTracker.SheheryarRaza
             AnsiConsole.Write(new Rule("[bold blue]Update Coding Session[/]"));
 
             var sessions = DisplaySessions(title: "Existing Sessions to Update");
-            if (sessions == null) return; // No sessions to update
+            if (sessions == null) return;
 
             int idToUpdate = UserInput.GetIdInput("Enter the ID of the session to update");
             var existingSession = _repository.GetSessionById(idToUpdate);
@@ -160,7 +159,6 @@ namespace CodingTracker.SheheryarRaza
             DateTime newStartTime = UserInput.GetDateTimeInput($"Enter new Start Time (current: {existingSession.StartTime:yyyy-MM-dd HH:mm})");
             DateTime newEndTime = UserInput.GetDateTimeInput($"Enter new End Time (current: {existingSession.EndTime:yyyy-MM-dd HH:mm})");
 
-            // Validate that new EndTime is not before new StartTime
             if (newEndTime < newStartTime)
             {
                 AnsiConsole.MarkupLine("[red]Error: New End Time cannot be before new Start Time. Update cancelled.[/]");
@@ -169,7 +167,7 @@ namespace CodingTracker.SheheryarRaza
 
             existingSession.StartTime = newStartTime;
             existingSession.EndTime = newEndTime;
-            existingSession.CalculateDuration(); // Recalculate duration
+            existingSession.CalculateDuration();
 
             try
             {
@@ -194,7 +192,7 @@ namespace CodingTracker.SheheryarRaza
             AnsiConsole.Write(new Rule("[bold blue]Delete Coding Session[/]"));
 
             var sessions = DisplaySessions(title: "Existing Sessions to Delete");
-            if (sessions == null) return; // No sessions to delete
+            if (sessions == null) return;
 
             int idToDelete = UserInput.GetIdInput("Enter the ID of the session to delete");
 
