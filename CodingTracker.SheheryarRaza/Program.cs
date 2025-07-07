@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 using CodingTracker.SheheryarRaza;
 using Dapper;
-using Spectre.Console; // Required for Spectre.Console
+using Spectre.Console;
 
 namespace CodingTimeTracker
 {
@@ -9,14 +11,25 @@ namespace CodingTimeTracker
     {
         static void Main(string[] args)
         {
-            SqlMapper.AddTypeHandler(typeof(TimeSpan), new TimeSpanHandler());
-            // Define the connection string directly
-            const string connectionString = "Data Source=codingtimetracker.db";
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
 
-            // Initialize the database, passing the connection string directly
+            SqlMapper.AddTypeHandler(typeof(TimeSpan), new TimeSpanHandler());
+
+            string connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                AnsiConsole.MarkupLine("[red]Error: Database connection string not found in appsettings.json.[/]");
+                AnsiConsole.MarkupLine("[blue]Please ensure 'ConnectionStrings:DefaultConnection' is configured.[/]");
+                Console.ReadKey();
+                return;
+            }
+
             DBContext.InitializeDatabase(connectionString);
 
-            // Create and run the CodingController
             var controller = new CodingController(connectionString);
             controller.Run();
 
